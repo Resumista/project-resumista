@@ -401,202 +401,205 @@ btnWorkDelete.disabled = true;
 btnVolunteerDelete.disabled = true;
 btnEducationDelete.disabled = true;
 
-// ADD DUPLICATE FORM FUNCTIONS
-function addWork() {
-    // Checks number of duplicated/form sections
-    let num = document.querySelectorAll(".work-cloned-input", ".work-cloned-textarea").length;
-    // Incremating the id by 1 for every new duplicate form
-    let newNum = num + 1;
-    let newElem = document.querySelector("#workEntry" + num);
-    // create new clone and change its ID using the newNum value
-    let newElemCloned = newElem.cloneNode(true);
-    newElemCloned.setAttribute("id", `workEntry${newNum}`);
+// let workSubStr = 'work';
+// let volSubStr = 'vol';
+// let eduSubStr = 'edu';
+// console.log(`LOOK HERE: ${workClone}`);
+
+// REFACTOR
+
+function cloneFormHelper(newElemCloned, newNum){
     // reset input values
     resetTextArea(newElemCloned);
     resetInputText(newElemCloned);
     // update childrens' ids
     updateIds(newElemCloned, newNum);
     updateWorkOnChange(newElemCloned, newNum);
+}
 
-    // Header Change
-    let header = newElemCloned.querySelector(".heading-ref");
-    header.setAttribute("id", "ID" + newNum + "_workRef");
-    header.setAttribute("name", "ID" + newNum + "_workRef");
-    header.innerHTML = "Job #" + newNum;
+function getFormSection(entry) {
+    if (entry.match(/^(workEntry1)$/)) {
+        // console.log(entry);
+        return entry;
+    }if (entry.match(/^(volunteerEntry1)$/)) {
+        // console.log(entry);
+        return entry;
+    }if (entry.match(/^(educationEntry1)$/)) {
+        // console.log(entry);
+        return entry;
+    }
+}
 
+function headerChange(headerStr, headerListing, newElemCloned, newNum){
+    let header = newElemCloned.querySelector(`.${headerStr}-heading-ref`);
+    header.setAttribute("id", "ID" + newNum + `_${headerStr}Ref`);
+    header.setAttribute("name", "ID" + newNum + `_${headerStr}Ref`);
+    header.innerHTML = `${headerListing} #` + newNum;
+}
+
+function formLimit(num, entry){
+    //Work and Volunteer Form Limit
+    if (num == 2 && entry.match(/^(workEntry1)$/)) {
+        btnWorkAdd.disabled = true;
+        btnWorkAdd.setAttribute("value", "You've reached the limit");
+    }
+    if (num === 2 && entry.match(/^(volunteerEntry1)$/)){
+        btnVolunteerAdd.disabled = true;
+        btnVolunteerAdd.setAttribute("value", "You've reached the limit");
+    }
+    // Education Form Limit
+    if (num === 1 && entry.match(/^(educationEntry1)$/)) {
+        btnEducationAdd.disabled = true;
+        btnEducationAdd.setAttribute("value", "You've reached the limit");
+    }
+}
+
+function cloneForm(num, entry, headerStr, headerListing) {
+    getFormSection
+    console.log(`entry: ${entry}`)
+    let entryNoNum = entry.slice(0,-1);
+    console.log(`entryNoNum: ${entryNoNum}`)
+    // Incremating the id by 1 for every new duplicate form
+    let newNum = num + 1;  
+    console.log(`newNum: ${newNum}`)
+    let newElem = document.querySelector(`#${entryNoNum}${num}`);
+    console.log(newElem)
+    // create new clone and change its ID using the newNum value
+    let newElemCloned = newElem.cloneNode(true);
+    console.log(newElemCloned);
+    newElemCloned.setAttribute("id", `${entryNoNum}${newNum}`);
+    // Header Change for new forms
+    headerChange(headerStr, headerListing, newElemCloned, newNum);
+
+    cloneFormHelper(newElemCloned, newNum);
     // Insert the new element after the last "duplicatable" input field
     newElem.after(newElemCloned);
 
     // Enable the "remove" button. This only shows once you have a duplicated section.
     btnWorkDelete.disabled = false;
-
-    if (newNum === 3) {
-        btnWorkAdd.disabled = true;
-        btnWorkAdd.setAttribute("value", "You've reached the limit");
-    }
-}
-
-function addVolunteer() {
-    // Checks number of duplicated/form sections
-    let num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
-    // Incremating the id by 1 for every new duplicate form
-    let newNum = num + 1;
-    let newElem = document.querySelector("#volunteerEntry" + num);
-    // create new clone and change its ID using the newNum value
-    let newElemCloned = newElem.cloneNode(true);
-    newElemCloned.setAttribute("id", `volunteerEntry${newNum}`);
-    // reset input values
-    resetInputText(newElemCloned);
-    resetTextArea(newElemCloned);
-    // update childrens' ids
-    updateIds(newElemCloned, newNum);
-    updateVolunteerOnChange(newElemCloned, newNum);
-
-    // Header Change
-    let header = newElemCloned.querySelector(".vol-heading-ref");
-    header.setAttribute("id", "ID" + newNum + "_volunteerRef");
-    header.setAttribute("name", "ID" + newNum + "_volunteerRef");
-    header.innerHTML = "Volunteer #" + newNum;
-
-    // Insert the new element after the last "duplicatable" input field
-    newElem.after(newElemCloned);
-
-    // Enable the "remove" button. This only shows once you have a duplicated section.
     btnVolunteerDelete.disabled = false;
-
-    if (newNum === 3) {
-        btnVolunteerAdd.disabled = true;
-        btnVolunteerAdd.setAttribute("value", "You've reached the limit");
-    }
-}
-
-function addEducation() {
-  
-    // Checks number of duplicated/form sections
-    let num = document.querySelectorAll(".edu-cloned-input").length;
-    // Incremating the id by 1 for every new duplicate form
-    let newNum = num + 1;
-    let newElem = document.querySelector("#educationEntry" + num);
-    // create new clone and change its ID using the newNum value
-    let newElemCloned = newElem.cloneNode(true);
-    newElemCloned.setAttribute("id", `educationEntry${newNum}`);
-    // reset input values
-    resetInputText(newElemCloned);
-    // update childrens' ids
-    updateIds(newElemCloned, newNum);
-
-    // Header Change
-    let header = newElemCloned.querySelector(".edu-heading-ref");
-    header.setAttribute("id", "ID" + newNum + "_educationRef");
-    header.setAttribute("name", "ID" + newNum + "_educationRef");
-    header.innerHTML = "Education #" + newNum;
-
-    // Insert the new element after the last "duplicatable" input field
-    newElem.after(newElemCloned);
-
-    // Enable the "remove" button. This only shows once you have a duplicated section.
     btnEducationDelete.disabled = false;
-
-    if (newNum === 2) {
-        btnEducationAdd.disabled = true;
-        btnEducationAdd.setAttribute("value", "You've reached the limit");
-    }
-
+    formLimit(num, entry);
+    
 }
 
-// DELETE DUPLICATE FORM FUNCTIONS
-function delWork() {
-    // check how many duplicated sections we currently have
-    let num = document.querySelectorAll(".work-cloned-input",".work-cloned-textarea").length;
-
-    // Confirmation dialog box
-    if (confirm(`Are you sure you wish to remove Job #${num}? This cannot be undone.`)) {
-        // remove last section
-        document.querySelector("#workEntry" + num).remove();
-        // update num
-        num = document.querySelectorAll(".work-cloned-input",".work-cloned-textarea").length;
-        if (num == 1) {
-            btnWorkDelete.disabled = true;
-        }
-        if (num < 5) {
-            btnWorkAdd.disabled = false;
-            btnWorkAdd.setAttribute("value", "add section");
-        }
-    }
-}
-
-function delVolunteer() {
-    //   console.log(`vol dup sections: ${num}`)
-    // check how many duplicated sections we currently have
-    let num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
-
-    // Confirmation dialog box
-    if (confirm(`Are you sure you wish to remove Volunteer #${num}? This cannot be undone.`)) {
-        // remove last section
-        document.querySelector("#volunteerEntry" + num).remove();
-        // update num
-        num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
-        if (num == 1) {
-            btnVolunteerDelete.disabled = true;
-        }
-        if (num < 5) {
-            btnVolunteerAdd.disabled = false;
-            btnVolunteerAdd.setAttribute("value", "add section");
+// DEL FORM REFACTOR
+function delForm(num, entry, headerListing){
+    if (entry.match(/^(workEntry1)$/)) {
+        console.log(`delete entry: ${entry}`);
+        console.log(`headerListing and Num: ${headerListing} #${num}`)
+        console.log(document.querySelector("#workEntry1"))
+        if (confirm(`Are you sure you wish to remove ${headerListing} #${num}? This cannot be undone.`)) {
+            // remove last section
+            console.log(`num before remove: #workEntry${num}`)
+            let formRemove = document.querySelector(`#workEntry${num}`).remove();
+            console.log(`formRemove: ${formRemove}`)
+            // update num
+            num = document.querySelectorAll(".work-cloned-input",".work-cloned-textarea").length;
+            console.log(`updated delete num: ${num}`)
+            if (num == 1) {
+                btnWorkDelete.disabled = true;
+                btnWorkAdd.disabled = false;
+            }
         }
     }
-}
 
-function delEducation() {
-    //   console.log(`vol dup sections: ${num}`)
-    // check how many duplicated sections we currently have
-    let num = document.querySelectorAll(".edu-cloned-input").length;
-
-    // Confirmation dialog box
-    if (confirm(`Are you sure you wish to remove Education #${num}? This cannot be undone.`)) {
-        // remove last section
-        document.querySelector("#educationEntry" + num).remove();
-        // update num
-        num = document.querySelectorAll(".edu-cloned-input").length;
-        if (num == 1) {
-            btnEducationDelete.disabled = true;
+    if(entry.match(/^(volunteerEntry1)$/)){
+        console.log(`delete entry: ${entry}`)
+        if(confirm(`Are you sure you wish to remove ${headerListing} #${num}? This cannot be undone.`)) {
+            // remove last section
+            let formRemove = document.querySelector(`#volunteerEntry${num}`).remove();
+            console.log(`formRemove: ${formRemove}`)
+            // update num
+            num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
+            console.log(`updated delete num: ${num}`)
+            if (num == 1) {
+                btnVolunteerDelete.disabled = true;
+                btnVolunteerAdd.disabled = false;
+            }
         }
-        if (num < 5) {
-            btnEducationAdd.disabled = false;
-            btnEducationAdd.setAttribute("value", "add section");
+    }
+    if(entry.match(/^(educationEntry1)$/)){
+        console.log(entry);
+        if (confirm(`Are you sure you wish to remove ${headerListing} #${num}? This cannot be undone.`)) {
+            // remove last section
+            document.querySelector(`#educationEntry${num}`).remove();
+            // update num
+            num = document.querySelectorAll(".edu-cloned-input",".edu-cloned-textarea").length;
+            console.log(`updated delete num: ${num}`)
+            if (num === 2) {
+                btnEducationDelete.disabled = true;
+                btnEducationAdd.disabled = false;
+            }
         }
     }
 }
-
 //ADD DUPLICATE FORM LISTENERS
 btnWorkAdd.addEventListener(
-    "click",
-    addWork
+    "click",function(){
+        //Checks for number of forms
+        let num = document.querySelectorAll(".work-cloned-input", ".work-cloned-textarea").length;
+        //Grab (form)Entry value
+        let entry = document.querySelector('#workEntry1').getAttributeNode("id").value;
+        let headerStr = 'work';
+        let headerListing = "Job";
+        cloneForm(num, entry, headerStr, headerListing);
+    }
+
 );
 
 btnVolunteerAdd.addEventListener(
-    "click",
-    addVolunteer
+    "click", function(){
+        let num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
+        let entry = document.querySelector('#volunteerEntry1').getAttributeNode("id").value;
+        let headerStr = 'vol';
+        let headerListing = "Volunteer";
+        cloneForm(num, entry, headerStr, headerListing);
+    }
+    
 );
 
 btnEducationAdd.addEventListener(
-    "click",
-    addEducation
+    "click",function(){
+        let num = document.querySelectorAll(".edu-cloned-input").length;
+        let entry = document.querySelector('#educationEntry1').getAttributeNode("id").value;
+        let headerStr = 'edu';
+        let headerListing = "Education";
+        cloneForm(num, entry, headerStr, headerListing);
+     }
 );
 
 // DELETE CLONED FORM LISTENERS
 btnWorkDelete.addEventListener(
-    "click",
-    delWork
+    "click",function(){
+        let num = document.querySelectorAll(".work-cloned-input", ".work-cloned-textarea").length;
+        //Grab (form)Entry value
+        let entry = document.querySelector('#workEntry1').getAttributeNode("id").value;
+        let headerListing = "Job";
+        delForm(num, entry, headerListing)
+    }
 );
 
 btnVolunteerDelete.addEventListener(
-    "click",
-    delVolunteer
+    "click",function(){
+        let num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
+        let entry = document.querySelector('#volunteerEntry1').getAttributeNode("id").value;
+        let headerListing = "Volunteer";
+        delForm(num, entry, headerListing)
+
+    }
 );
 
 btnEducationDelete.addEventListener(
-    "click",
-    delEducation
+    "click",function(){
+        let num = document.querySelectorAll(".edu-cloned-input").length;
+        let entry = document.querySelector('#educationEntry1').getAttributeNode("id").value;
+        let headerListing = "Education";
+        delForm(num, entry, headerListing)
+
+        
+    }
+    
 );
 
 var jobsAndSkills = {};

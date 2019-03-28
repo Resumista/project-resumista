@@ -1,19 +1,3 @@
-
-/*
-TODO: 
-    REFACTOR:
-    Functions: signUp, workHistory, volunteerHistory, educationHistory, resumeGenerate (Lines: 44 - 332)
-        We're there is a better way to grab this information from the user than doing a ton of querySelectors but
-        not sure of the best route to go.
-
-    Functions: addWork, addVolunteer, addEducation, delWork, delVolunteer, delEducation (Lines: 416 - 579)
-        I am pretty sure I can figure this out on my own, currently my idea is to see if an element contains a class
-        i can try it compare it with another string, so if the element contains the class "work-cloned-input" i can compare it
-        with the other string and if they match, then execute the code i need. But if there are better ways to do it, i am open to it!
-*/
-
-
-
 //JS object to store all resume info
 const finalResume = {};
 
@@ -327,6 +311,8 @@ function resumeGenerate() {
     }
 }
 
+// --------------FUNCTIONS------------------
+
 //Function to Update Ids of all inputs when forms are cloned
 function updateIds(clone, newNum) {
     let inputs = clone.querySelectorAll("*");
@@ -372,42 +358,7 @@ function resetTextArea (newElemCloned) {
     }
 }
 
-function printResume () {
-    window.print();
-}
-
-// 
-
-// ----------------- ADD/DELETE DUPLICATE FORM FEATURE ------------------------
-// TODO: Refactor way too much copied code, not sure how....
-
-// ADD DUPLICATE FORM QUERIES
-const btnWorkAdd = document.querySelector("#btnWorkAddForm");
-const btnVolunteerAdd = document.querySelector("#btnVolunteerAddForm");
-const btnEducationAdd = document.querySelector("#btnEducationAddForm");
-
-// DELETE DUPLICATE FORM QUERIES
-const btnWorkDelete = document.querySelector("#btnWorkDeleteForm");
-const btnVolunteerDelete = document.querySelector("#btnVolunteerDeleteForm");
-const btnEducationDelete = document.querySelector("#btnEducationDeleteForm");
-
-// PERM ENABLE ADD FORM FUNCTION, doesnt seem like its needed at all
-// btnWorkAdd.disabled = false;
-// btnVolunteerAdd.disabled = false;
-// btnEducationAdd.disabled = false;
-
-//DISABLE DELETE FORM BTN ON 1st FORM
-btnWorkDelete.disabled = true;
-btnVolunteerDelete.disabled = true;
-btnEducationDelete.disabled = true;
-
-// let workSubStr = 'work';
-// let volSubStr = 'vol';
-// let eduSubStr = 'edu';
-// console.log(`LOOK HERE: ${workClone}`);
-
-// REFACTOR
-
+// Grouped resetTextArea, resetInputText, updateIds, and updateWorkOnChange functions into helper function
 function cloneFormHelper(newElemCloned, newNum){
     // reset input values
     resetTextArea(newElemCloned);
@@ -417,26 +368,27 @@ function cloneFormHelper(newElemCloned, newNum){
     updateWorkOnChange(newElemCloned, newNum);
 }
 
+// function to grab entry value to detemine which section we in (Work, Volunteer, Education)
 function getFormSection(entry) {
     if (entry.match(/^(workEntry1)$/)) {
-        // console.log(entry);
         return entry;
     }if (entry.match(/^(volunteerEntry1)$/)) {
-        // console.log(entry);
         return entry;
     }if (entry.match(/^(educationEntry1)$/)) {
-        // console.log(entry);
         return entry;
     }
 }
 
+// fucntion to change the header for each new cloned form section
 function headerChange(headerStr, headerListing, newElemCloned, newNum){
+    //querying header and setting innerHTML to section listing plus num (i.e Job #3, Volunteer #2)
     let header = newElemCloned.querySelector(`.${headerStr}-heading-ref`);
     header.setAttribute("id", "ID" + newNum + `_${headerStr}Ref`);
     header.setAttribute("name", "ID" + newNum + `_${headerStr}Ref`);
     header.innerHTML = `${headerListing} #` + newNum;
 }
 
+//function to limit number of form sections
 function formLimit(num, entry){
     //Work and Volunteer Form Limit
     if (num == 2 && entry.match(/^(workEntry1)$/)) {
@@ -454,23 +406,21 @@ function formLimit(num, entry){
     }
 }
 
+// function to clone/duplicate form
 function cloneForm(num, entry, headerStr, headerListing) {
+    //returns var entry, to determine which section were on
     getFormSection
-    console.log(`entry: ${entry}`)
+    // changes entry value to entry value minus the last number
     let entryNoNum = entry.slice(0,-1);
-    console.log(`entryNoNum: ${entryNoNum}`)
     // Incremating the id by 1 for every new duplicate form
     let newNum = num + 1;  
-    console.log(`newNum: ${newNum}`)
     let newElem = document.querySelector(`#${entryNoNum}${num}`);
-    console.log(newElem)
     // create new clone and change its ID using the newNum value
     let newElemCloned = newElem.cloneNode(true);
-    console.log(newElemCloned);
     newElemCloned.setAttribute("id", `${entryNoNum}${newNum}`);
     // Header Change for new forms
     headerChange(headerStr, headerListing, newElemCloned, newNum);
-
+    // Resets Text Areas, Inputs, and updates Ids 
     cloneFormHelper(newElemCloned, newNum);
     // Insert the new element after the last "duplicatable" input field
     newElem.after(newElemCloned);
@@ -479,40 +429,32 @@ function cloneForm(num, entry, headerStr, headerListing) {
     btnWorkDelete.disabled = false;
     btnVolunteerDelete.disabled = false;
     btnEducationDelete.disabled = false;
+    // Limits number of forms per section
     formLimit(num, entry);
     
 }
 
-// DEL FORM REFACTOR
+// function to delete forms
 function delForm(num, entry, headerListing){
+    // if entry value matches certin section string then will remove section per form.
     if (entry.match(/^(workEntry1)$/)) {
-        console.log(`delete entry: ${entry}`);
-        console.log(`headerListing and Num: ${headerListing} #${num}`)
-        console.log(document.querySelector("#workEntry1"))
         if (confirm(`Are you sure you wish to remove ${headerListing} #${num}? This cannot be undone.`)) {
             // remove last section
-            console.log(`num before remove: #workEntry${num}`)
-            let formRemove = document.querySelector(`#workEntry${num}`).remove();
-            console.log(`formRemove: ${formRemove}`)
+            document.querySelector(`#workEntry${num}`).remove();
             // update num
             num = document.querySelectorAll(".work-cloned-input",".work-cloned-textarea").length;
-            console.log(`updated delete num: ${num}`)
             if (num == 1) {
                 btnWorkDelete.disabled = true;
                 btnWorkAdd.disabled = false;
             }
         }
     }
-
     if(entry.match(/^(volunteerEntry1)$/)){
-        console.log(`delete entry: ${entry}`)
         if(confirm(`Are you sure you wish to remove ${headerListing} #${num}? This cannot be undone.`)) {
             // remove last section
-            let formRemove = document.querySelector(`#volunteerEntry${num}`).remove();
-            console.log(`formRemove: ${formRemove}`)
+            document.querySelector(`#volunteerEntry${num}`).remove();
             // update num
             num = document.querySelectorAll(".vol-cloned-input",".vol-cloned-textarea").length;
-            console.log(`updated delete num: ${num}`)
             if (num == 1) {
                 btnVolunteerDelete.disabled = true;
                 btnVolunteerAdd.disabled = false;
@@ -520,13 +462,11 @@ function delForm(num, entry, headerListing){
         }
     }
     if(entry.match(/^(educationEntry1)$/)){
-        console.log(entry);
         if (confirm(`Are you sure you wish to remove ${headerListing} #${num}? This cannot be undone.`)) {
             // remove last section
             document.querySelector(`#educationEntry${num}`).remove();
             // update num
             num = document.querySelectorAll(".edu-cloned-input",".edu-cloned-textarea").length;
-            console.log(`updated delete num: ${num}`)
             if (num === 2) {
                 btnEducationDelete.disabled = true;
                 btnEducationAdd.disabled = false;
@@ -534,7 +474,28 @@ function delForm(num, entry, headerListing){
         }
     }
 }
-//ADD DUPLICATE FORM LISTENERS
+
+// function to print resume
+function printResume () {
+    window.print();
+}
+
+// ADD DUPLICATE FORM QUERIES
+const btnWorkAdd = document.querySelector("#btnWorkAddForm");
+const btnVolunteerAdd = document.querySelector("#btnVolunteerAddForm");
+const btnEducationAdd = document.querySelector("#btnEducationAddForm");
+
+// DELETE DUPLICATE FORM QUERIES
+const btnWorkDelete = document.querySelector("#btnWorkDeleteForm");
+const btnVolunteerDelete = document.querySelector("#btnVolunteerDeleteForm");
+const btnEducationDelete = document.querySelector("#btnEducationDeleteForm");
+
+//DISABLE DELETE FORM BTN ON 1st FORM
+btnWorkDelete.disabled = true;
+btnVolunteerDelete.disabled = true;
+btnEducationDelete.disabled = true;
+
+//CLONE FORM LISTENERS
 btnWorkAdd.addEventListener(
     "click",function(){
         //Checks for number of forms
@@ -601,6 +562,12 @@ btnEducationDelete.addEventListener(
     }
     
 );
+// PRINT BUTTON LISTENER
+let btnPrint = document.querySelector("#printBtn");
+btnPrint.addEventListener(
+    "click",
+    printResume)
+
 
 var jobsAndSkills = {};
 // student
@@ -662,11 +629,3 @@ function changeVolunteerSkillsList(num) {
   }
 }
 
-function printResume () {
-    window.print();
-}
-
-let btnPrint = document.querySelector("#printBtn");
-btnPrint.addEventListener(
-    "click",
-    printResume)
